@@ -1,9 +1,11 @@
 import streamlit as st
-from langchain_openai import OpenAI
+from langchain import OpenAI  # Update the import based on the actual module name
 from langchain.prompts import PromptTemplate
 
-# Initialize OpenAI API
+# Read the API key from Streamlit secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
+
+# Initialize OpenAI API
 openai = OpenAI(api_key=openai_api_key, model='gpt-3.5-turbo-instruct', temperature=0)
 
 # Read the prompt from a file and truncate if necessary
