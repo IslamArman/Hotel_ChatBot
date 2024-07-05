@@ -1,12 +1,8 @@
 import streamlit as st
-from langchain import OpenAI  # Update the import based on the actual module name
-from langchain.prompts import PromptTemplate
+import openai
 
 # Read the API key from Streamlit secrets
-openai_api_key = st.secrets["OPENAI_API_KEY"]
-
-# Initialize OpenAI API
-openai = OpenAI(api_key=openai_api_key, model='gpt-3.5-turbo-instruct', temperature=0)
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Read the prompt from a file and truncate if necessary
 with open('website_text.txt', 'r') as file:
@@ -30,18 +26,15 @@ Question: {question}
 Answer: 
 """
 
-# Create the prompt template
-hotel_assistant_prompt_template = PromptTemplate( 
-    input_variables=["question"], 
-    template=hotel_assistant_template 
-)
-
-# Define a function to query the language model
-def query_llm(question): 
-    llm_chain = hotel_assistant_prompt_template | openai
+def query_llm(question):
+    full_prompt = hotel_assistant_template.format(question=question)
     try:
-        response = llm_chain.invoke({'question': question})
-        return response
+        response = openai.Completion.create(
+            model="gpt-3.5-turbo-instruct",
+            prompt=full_prompt,
+            max_tokens=256
+        )
+        return response.choices[0].text.strip()
     except Exception as e:
         return f"Error: {e}"
 
